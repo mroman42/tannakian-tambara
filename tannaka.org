@@ -1,0 +1,345 @@
+#+Title: Tannakian reconstruction of Tambara modules
+#+Author: Mario Román
+#+Subtitle: Or, why that "optics" formula?
+#+latex_class_options: [11pt, dvipsnames]
+#+options: todo:nil toc:nil
+
+* Header                                                                                    :ignore:
+** Header                                                                                  :ignore:
+#+latex_header: \usepackage[a4paper,verbose]{geometry}
+#+latex_header: \geometry{top=3cm,bottom=3cm,left=3cm,right=3cm,textheight=595pt}
+#+latex_header: \setlength{\parskip}{0.3em}
+
+#+latex_header: \usepackage{amsfonts}
+#+latex_header: \usepackage{amssymb}
+#+latex_header: \usepackage{amsthm}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{tipa}
+#+latex_header: \usepackage{caption}
+#+latex_header: \usepackage[dvipsnames]{xcolor}
+#+latex_header: \usepackage[inline]{enumitem}
+#+latex_header: \setlist{itemsep=0em, topsep=0em, parsep=0em}
+#+latex_header: \setlist[enumerate]{label=(\alph*)}
+#+latex_header: \usepackage{etoolbox}
+#+latex_header: \usepackage{stmaryrd} 
+#+latex_header: \usepackage{hyperref}
+#+latex_header: \hypersetup{
+#+latex_header:   colorlinks=true,
+#+latex_header:   linkcolor=[rgb]{0.0,0.27,0.13},
+#+latex_header:   citecolor=[rgb]{0.0,0.27,0.13},
+#+latex_header:   urlcolor=[rgb]{0.0,0.27,0.13}}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \graphicspath{{assets/}}
+#+latex_header: \usepackage{mathtools}
+#+latex_header: 
+#+latex_header: \usepackage{minted}
+#+latex_header: \usepackage{tikz}
+#+latex_header: \usepackage{float}
+#+latex_header: \usetikzlibrary{
+#+latex_header:   matrix,
+#+latex_header:   arrows,
+#+latex_header:   shapes
+#+latex_header: }
+
+#+latex_header: \usepackage{tikz-cd}
+
+#+latex_header: \usepackage{CJKutf8}\usepackage[utf8]{inputenc} 
+#+latex_header: \newcommand{\hirayo}{\text{\usefont{U}{min}{m}{n}\symbol{'210}}} 
+#+latex_header: \newcommand{\hirata}{\text{\usefont{U}{min}{m}{n}\symbol{'137}}} \DeclareFontFamily{U}{min}{} \DeclareFontShape{U}{min}{m}{n}{<-> udmj30}{}
+
+** AMS packages                                                                            :ignore:
+#+latex_header: \usepackage{amsfonts}
+#+latex_header: \usepackage{amssymb}
+#+latex_header: \usepackage{amsthm}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage[margin=1cm]{caption}
+#+latex_header: \allowdisplaybreaks
+
+** Marsden's diagrams                                                                      :ignore:
+# I am using Marsden's diagram macros.
+#+latex_header: \usepackage{macros}
+#+latex_header: \usepackage{diag}
+#+latex_header: \usepackage{eqproof}
+
+#+latex_header: \newcommand{\leftop}{\ensuremath{\operatorname{\lhd}}}
+#+latex_header: \newcommand{\rightop}{\ensuremath{\operatorname{\rhd}}}
+
+#+latex_header: \newcommand{\mvright}[1]{\ensuremath{#1^{\rhd}}}
+#+latex_header: \newcommand{\mvrightright}[1]{\ensuremath{#1^{\rhd\rhd}}}
+#+latex_header: \newcommand{\mvleft}[1]{\ensuremath{#1^{\lhd}}}
+#+latex_header: \newcommand{\mvleftleft}[1]{\ensuremath{#1^{\lhd\lhd}}}
+
+#+latex_header: \newcommand{\adjsql}[1]{\ensuremath{#1_l}}
+#+latex_header: \newcommand{\adjsqr}[1]{\ensuremath{#1_r}}
+
+#+latex_header: \newcommand{\repcontrato}[4]{
+#+latex_header: \path (#1.center) ++(0,-0.5) coordinate (#1-r)
+#+latex_header:      +(-1,1) coordinate (#1-rl)
+#+latex_header:      +(1,1) coordinate (#1-rr);
+#+latex_header: \coordinate (#1-a) at (#1.south);
+#+latex_header: \path
+#+latex_header:  let \p1 = (#1.north) in
+#+latex_header:  let \p2 = (#1-rl) in
+#+latex_header:  let \p3 = (#1-rr) in
+#+latex_header:  coordinate (#1-b) at (\x2, \y1)
+#+latex_header:  coordinate (#1-c) at (\x3, \y1);
+#+latex_header: \fill[catset] (#1.south) -- (#1-r) to[out=0, in=270] (#1-rr) -- (#1-c) -- (#1.north east) -- (#1.south east) -- cycle;
+#+latex_header: \fill[catcop] (#1-b) -- (#1-rl) to[out=270,in=180] (#1-r) to[out=0,in=270] (#1-rr) -- (#1-c) -- cycle;
+#+latex_header: \fill[catterm] (#1.south) -- (#1-r) to[out=180, in=270] (#1-rl) -- (#1-b) -- (#1.north west) -- (#1.south west) -- cycle;
+#+latex_header: \draw (#1-r) to[out=180,in=270] (#1-rl) to node[swap]{#2} (#1-b);
+#+latex_header: \draw (#1-r) to[out=0, in=270] (#1-rr) to node[swap]{#3} (#1-c);
+#+latex_header: \draw (#1-a) to node[swap]{$*$} (#1-r);
+#+latex_header: \strnat{#1-r};
+#+latex_header: \strlabu{#1-r}{#4}
+#+latex_header: }
+#+latex_header: \newcommand{\repcontratoex}[5]{
+#+latex_header: \coordinate[label=below:#2] (#1-b) at (#1.south);
+#+latex_header: \coordinate[label=above:#5] (#1-t) at (#1.north);
+#+latex_header:  \draw (#1-b) -- ++(0,1.5)
+#+latex_header:        (#1-t) -- ++(0,-1.5);
+#+latex_header:  \path (#1.south west) -- ++(0.5,1) coordinate (#1-bl)
+#+latex_header:        (#1.north east) -- ++(-0.5,-1) coordinate (#1-tr);
+#+latex_header:  \node[rectangle, fit=(#1-bl)(#1-tr)] (#1-subdiag) {};
+#+latex_header:  \repcontrato{#1-subdiag}{#2}{#3}{#4};
+#+latex_header:  \draw[very thick] (#1-subdiag.south west) rectangle (#1-subdiag.north east);
+#+latex_header: \begin{pgfonlayer}{background}
+#+latex_header:  \fill[catterm] (#1.south west) rectangle (#1.north);
+#+latex_header:  \fill[catc] (#1.south east) rectangle (#1.north);
+#+latex_header: \end{pgfonlayer}
+#+latex_header: }
+** Theorem styles                                                                          :ignore:
+#+latex_header_extra: \theoremstyle{plain}
+#+latex_header_extra: \newtheorem{theorem}{Theorem}
+#+latex_header_extra: \newtheorem{proposition}[theorem]{Proposition}
+#+latex_header_extra: \newtheorem{question}[theorem]{Question}
+#+latex_header_extra: \newtheorem{requestion}[theorem]{Research Question}
+#+latex_header_extra: \newtheorem{lemma}[theorem]{Lemma}
+#+latex_header_extra: \newtheorem{corollary}[theorem]{Corollary}
+#+latex_header_extra: \theoremstyle{definition}
+#+latex_header_extra: \newtheorem{definition}[theorem]{Definition}
+#+latex_header_extra: \newtheorem{axiom}[theorem]{Axiom}
+#+latex_header_extra: \newtheorem{proofs}{Proof}
+#+latex_header_extra: \theoremstyle{remark}
+#+latex_header_extra: \newtheorem{remark}[theorem]{Remark}
+#+latex_header_extra: \newtheorem{exampleth}[theorem]{Example}
+#+latex_header_extra: \begingroup\makeatletter\@for\theoremstyle:=definition,remark,plain\do{\expandafter\g@addto@macro\csname th@\theoremstyle\endcsname{\addtolength\thm@preskip\parskip}}\endgroup
+
+** Macros                                                                                  :ignore:
+#+latex_header: \newcommand{\R}{{\cal{R}}}
+#+latex_header: \newcommand{\Class}{\mathbf{S}}
+
+#+latex_header: \newcommand{\nto}{\nrightarrow}
+
+#+latex_header: \newcommand{\iam}[1]{
+#+latex_header:   \vspace{0.25em}
+#+latex_header:   \hrule
+#+latex_header:   \vspace{0.25em}
+#+latex_header:   \textbf{{#1} writes: }
+#+latex_header:   \vspace{0.25em}
+#+latex_header:   \hrule
+#+latex_header:   \vspace{1em}
+#+latex_header: }
+
+#+latex_header: \newcommand{\respond}[2]{\quad[\textbf{#1 says:} {\color{ForestGreen} #2}]\quad}
+#+latex_header: \newenvironment{note}{\quad\color{ForestGreen}\textbf{Note:} \begingroup\itshape}{\endgroup\quad}
+
+#+latex_header: \usepackage{mathtools}
+#+latex_header: \newcommand\id{\mathrm{id}}
+#+latex_header: \newcommand\dinat{\overset{\cdot\cdot}\to}
+#+latex_header: \newcommand\Id{\mathrm{Id}}
+#+latex_header: \newcommand\Nat{\mathrm{Nat}}
+#+latex_header: \newcommand\Grp{\mathsf{Grp}}
+#+latex_header: \newcommand\Set{\mathsf{Set}}
+#+latex_header: \newcommand\zet{\mathbb{Z}}
+#+latex_header: \newcommand\nat{\mathbb{N}}
+#+latex_header: \newcommand\lensto{\nrightarrow}
+#+latex_header: \newcommand\rat{\mathbb{Q}}
+#+latex_header: \newcommand\reals{\mathbb{R}}
+#+latex_header: \newcommand\com{\mathbb{C}}
+#+latex_header: \newcommand\hC{\widehat{\cal C}}
+#+latex_header: \newcommand\todot{\xrightarrow{.}}
+#+latex_header: \newcommand\tonat{\Rightarrow}
+#+latex_header: \newcommand\shape{\mbox{\textesh}}
+#+latex_header: \usepackage{mathtools}
+#+latex_header: \DeclarePairedDelimiter\pair{\langle}{\rangle}
+
+#+latex_header: \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+#+latex_header: \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+#+latex_header: \DeclarePairedDelimiter\brck{\llbracket}{\rrbracket}%
+
+#+latex_header: \newcommand\opticmorph[4]{\begin{pmatrix}#1 \\ #2\end{pmatrix} \to \begin{pmatrix}#3 \\ #4\end{pmatrix}}
+
+* Macros                                                                                    :ignore:
+#+latex_header: \newcommand{\repl}{\mathrm{repl}}
+#+latex_header: \newcommand{\img}{\mathrm{img}}
+#+latex_header: \newcommand{\App}{\mathbf{App}}
+
+#+latex_header: \newcommand{\optic}[2]{\langle #1 \mid #2 \rangle}
+#+latex_header: \newcommand{\trv}{\operatorname{trv}}
+#+latex_header: \newcommand{\Optic}{\mathbf{Optic}}
+#+latex_header: \newcommand{\Sets}{\mathbf{Sets}}
+#+latex_header: \newcommand{\Lan}{\mathsf{Lan}}
+#+latex_header: \newcommand{\Ran}{\mathsf{Ran}}
+#+latex_header: \newcommand{\Nat}{\mathrm{Nat}}
+
+#+latex_header: \newcommand{\Prof}{\mathbf{Prof}}
+#+latex_header: \newcommand{\C}{\mathbf{C}}
+#+latex_header: \newcommand{\D}{\mathbf{D}}
+#+latex_header: \newcommand{\M}{\mathbf{M}}
+#+latex_header: \newcommand{\N}{\mathbf{N}}
+#+latex_header: \newcommand{\mact}{\underline{M}}
+#+latex_header: \newcommand{\nact}{\underline{N}}
+#+latex_header: \newcommand{\iact}{\underline{I}}
+#+latex_header: \newcommand{\kact}{\underline{K}}
+
+#+latex_header: \newcommand{\nto}{\nrightarrow}
+#+latex_header: \newcommand\id{\mathrm{id}}
+#+latex_header: \newcommand\dinat{\overset{\cdot\cdot}\to}
+#+latex_header: \newcommand\Id{\mathrm{Id}}
+#+latex_header: \newcommand\Nat{\mathrm{Nat}}
+#+latex_header: \newcommand\Grp{\mathsf{Grp}}
+#+latex_header: \newcommand\Set{\mathsf{Set}}
+#+latex_header: \newcommand\zet{\mathbb{Z}}
+#+latex_header: \newcommand\nat{\mathbb{N}}
+#+latex_header: \newcommand\lensto{\nrightarrow}
+#+latex_header: \newcommand\rat{\mathbb{Q}}
+#+latex_header: \newcommand\reals{\mathbb{R}}
+#+latex_header: \newcommand\com{\mathbb{C}}
+#+latex_header: \newcommand\hC{\widehat{\cal C}}
+#+latex_header: \newcommand\todot{\xrightarrow{.}}
+#+latex_header: \newcommand\tonat{\Rightarrow}
+#+latex_header: \newcommand\shape{\mbox{\textesh}}
+#+latex_header: \newcommand\Vcat{\cal{V}\mbox{-category}}
+#+latex_header: \newcommand\Vfunctor{\cal{V}\mbox{-functor}}
+#+latex_header: \newcommand\Vt[1]{\cal{V}\mbox{-#1}}
+#+latex_header: \newcommand\V{{\cal{V}}}
+#+latex_header: \newcommand\opticmorph[4]{\begin{pmatrix}#1 \\ #2\end{pmatrix} \to \begin{pmatrix}#3 \\ #4\end{pmatrix}}
+
+#+latex_header: \DeclarePairedDelimiter\pair{\langle}{\rangle}
+#+latex_header: \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+#+latex_header: \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+#+latex_header: \DeclarePairedDelimiter\brck{\llbracket}{\rrbracket}%
+
+* Macros                                                                                    :ignore:
+#+latex_header: \newcommand{\repl}{\mathrm{repl}}
+#+latex_header: \newcommand{\img}{\mathrm{img}}
+#+latex_header: \newcommand{\App}{\mathbf{App}}
+
+#+latex_header: \newcommand{\optic}[2]{\langle #1 \mid #2 \rangle}
+#+latex_header: \newcommand{\trv}{\operatorname{trv}}
+#+latex_header: \newcommand{\Optic}{\mathbf{Optic}}
+#+latex_header: \newcommand{\Sets}{\mathbf{Sets}}
+#+latex_header: \newcommand{\Lan}{\mathsf{Lan}}
+#+latex_header: \newcommand{\Ran}{\mathsf{Ran}}
+#+latex_header: \newcommand{\Nat}{\mathrm{Nat}}
+
+#+latex_header: \newcommand{\Prof}{\mathbf{Prof}}
+#+latex_header: \newcommand{\C}{\mathbf{C}}
+#+latex_header: \newcommand{\D}{\mathbf{D}}
+#+latex_header: \newcommand{\M}{\mathbf{M}}
+#+latex_header: \newcommand{\N}{\mathbf{N}}
+#+latex_header: \newcommand{\mact}{\underline{m}}
+#+latex_header: \newcommand{\nact}{\underline{n}}
+#+latex_header: \newcommand{\iact}{\underline{i}}
+#+latex_header: \newcommand{\kact}{\underline{k}}
+
+#+latex_header: \newcommand{\nto}{\nrightarrow}
+#+latex_header: \newcommand\id{\mathrm{id}}
+#+latex_header: \newcommand\dinat{\overset{\cdot\cdot}\to}
+#+latex_header: \newcommand\Id{\mathrm{Id}}
+#+latex_header: \newcommand\Nat{\mathrm{Nat}}
+#+latex_header: \newcommand\Grp{\mathsf{Grp}}
+#+latex_header: \newcommand\Set{\mathsf{Set}}
+#+latex_header: \newcommand\zet{\mathbb{Z}}
+#+latex_header: \newcommand\nat{\mathbb{N}}
+#+latex_header: \newcommand\lensto{\nrightarrow}
+#+latex_header: \newcommand\rat{\mathbb{Q}}
+#+latex_header: \newcommand\reals{\mathbb{R}}
+#+latex_header: \newcommand\com{\mathbb{C}}
+#+latex_header: \newcommand\hC{\widehat{\cal C}}
+#+latex_header: \newcommand\todot{\xrightarrow{.}}
+#+latex_header: \newcommand\tonat{\Rightarrow}
+#+latex_header: \newcommand\shape{\mbox{\textesh}}
+#+latex_header: \newcommand\Vcat{\cal{V}\mbox{-category}}
+#+latex_header: \newcommand\Vfunctor{\cal{V}\mbox{-functor}}
+#+latex_header: \newcommand\Vt[1]{\cal{V}\mbox{-#1}}
+#+latex_header: \newcommand\V{{\cal{V}}}
+#+latex_header: \newcommand\opticmorph[4]{\begin{pmatrix}#1 \\ #2\end{pmatrix} \to \begin{pmatrix}#3 \\ #4\end{pmatrix}}
+
+#+latex_header: \DeclarePairedDelimiter\pair{\langle}{\rangle}
+#+latex_header: \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+#+latex_header: \DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+#+latex_header: \DeclarePairedDelimiter\brck{\llbracket}{\rrbracket}%
+
+* Definition of Tambara module
+Let $\M$ be a monoidal category acting both on
+two arbitrary categories $\C$ and $\D$.  We write $\mact$ for the image
+of $M \in \M$ both in $[\C,\C]$ and $[\D,\D]$.
+
+#+begin_definition
+<<def:tambara>>
+A *Tambara module* consists of a profunctor $P \colon \C^{op} \times \mathbf{D} \to \Sets$
+endowed with a family of morphisms $\alpha_M \colon P(A,B) \to P(\mact A , \mact B)$
+natural in both $A \in \C$ and $B \in \D$, and dinatural in $M \in \M$; which additionally
+makes the following diagrams commute.
+\[\begin{tikzcd}[column sep=small]
+P(A,B) \drar[swap]{\mathrm{id}}\rar{\alpha_{I}} & P(\iact A, \iact B) \dar{\cong} &
+  & P(\underline{N}A,\underline{N}B) \rar{\alpha_M} & P(\underline{MN}A,\underline{MN}B)\dar{\cong} \\
+& P(A,B) &&P(A,B) \uar{\alpha_N} \rar[swap]{\alpha_{N \otimes M}}& P(\underline{M \otimes N}A,\underline{M \otimes N}B)
+\end{tikzcd}\]
+#+end_definition
+
+#+begin_remark
+The original definition of Tambara module cite:tambara06 deals only
+with actions that arise from a monoidal product $\otimes \colon \C \to [ \C , \C ]$. We
+use the term /Tambara module/ also for the more general concept, allowing
+for arbitrary monoidal actions.
+#+end_remark
+
+We can extend Pastro and Street cite:pastro08 construction of free Tambara 
+module over a profunctor $P \colon \C^{op} \times \D \to \Sets$ to the case of general
+monoidal actions. Tambara modules are equivalently algebras for a monad $\Psi$ defined
+by
+\[
+\Psi P (S,T) = \int^{M,X,Y} \C(S,\mact X) \times \D(\mact Y , T) \times P(X,Y).
+\]
+We know how to contruct free Tambara modules. What is the
+free Tambara module over a representable functor $\hom((A,B),-)$?
+We call it $\Optic((A,B),-)$, and it can be written as
+\[
+\mathbf{Optic}((A,B),(S,T)) \cong \int^M \C(S,\mact A) \times \D(\mact B, T).
+\]
+That is, the formula for optics is given by the free Tambara module on
+a representable functor.
+
+* Tannakian reconstruction
+Milewski cite:milewski17, and then Boisseau and Gibbons
+cite:boisseau18, proved a unified profunctor representation theorem
+for optics, that is widely used in programming libraries such as
+Kmett's /lens/ cite:kmett15. Milewski suggested to me that 
+profunctor representation was surprisingly similar to Tannakian 
+reconstruction; we will prove the theorem following the proof of
+Tannakian reconstruction (for, say, groups).  The proof written
+in this way is similar to the one used by Riley cite:riley18.
+
+#+begin_theorem
+Let $\mathcal{U}_{(A,B)} \colon \hirata \to \Sets$ the functor that evaluates a Tambara module
+on the object $(A,B)$. There exists an isomorphism
+\[
+[\hirata, \Sets] \left(   \mathcal{U}_{(A,B)} , \mathcal{U}_{(S,T)} \right) \cong
+\Optic((A,B),(S,T)),
+\]
+natural on both $(A,B)$ and $(S,T)$.
+#+end_theorem
+#+begin_proof
+The claim is that this theorem is precisely Tannakian reconstruction
+for Tambara modules.  We first note that, by definition, the functor
+$\mathcal{U}_{(A,B)}$ is represented by $\Optic((A,B),-)$, the free Tambara module
+over the hom-profunctor. In fact, for any Tambara module $P \colon \C^{op} \times \C \to \Sets$,
+\[\mathcal{U}_{(A,B)} P \cong \Nat( \hom((A,B),-) , P )\cong \hirata( \Optic((A,B),-) , P ).\]
+Then, following Tannakian reconstruction, $[\hirata, \Sets]\left(   \mathcal{U}_{(A,B)} , \mathcal{U}_{(S,T)} \right) \cong \Optic((A,B),(S,T))$.
+#+end_proof
+
+* References                                                                                :ignore:
+bibliographystyle:alpha
+bibliography:./optics.bib
